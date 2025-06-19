@@ -6,6 +6,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import Layout from './components/Layout/Layout';
 import Dashboard from './pages/Dashboard';
 import StudentProfile from './pages/StudentProfile';
+import { Analytics } from "@vercel/analytics/react"
 import './App.css';
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
     <ThemeProvider>
       <Router>
         <div className="min-h-screen bg-background text-foreground">
+          <Analytics/>
           <Layout>
             <Routes>
               {/* Dashboard - Main student table */}
