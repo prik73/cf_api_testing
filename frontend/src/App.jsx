@@ -6,6 +6,7 @@ import Layout from './components/Layout/Layout';
 import Dashboard from './pages/Dashboard';
 import StudentProfile from './pages/StudentProfile';
 import AdminDashboard from './pages/AdminDashboard';
+import { Analytics } from "@vercel/analytics/react"
 import './App.css';
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
         <div className="min-h-screen bg-background text-foreground">
           <Layout>
             <Routes>
+              <Analytics/>
               {/* Dashboard - Main student table */}
               <Route path="/" element={<Dashboard />} />
               
