@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { GraduationCap, Moon, Sun, Users, TrendingUp, Trophy, RefreshCw, Settings } from 'lucide-react';
+import { GraduationCap, Moon, Sun, Users, TrendingUp, Trophy, RefreshCw, Settings, Code, Target } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useTheme } from '../../contexts/ThemeContext';
 import { studentAPI } from '../../services/api';
@@ -73,33 +73,47 @@ const Layout = ({ children }) => {
       <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/70 border-b border-border">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
-            {/* Logo and Title */}
-            <div className="flex items-center gap-3">
+            {/* Enhanced Logo and Title */}
+            <div className="flex items-center gap-4">
+              {/* Logo with Animation */}
               <div 
-                className="p-2 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 text-white cursor-pointer"
+                className="relative p-3 rounded-2xl bg-gradient-to-br from-blue-500 via-purple-600 to-indigo-700 text-white cursor-pointer hover:scale-105 transition-transform duration-200 shadow-lg"
                 onClick={() => navigate('/')}
               >
-                <GraduationCap className="h-6 w-6" />
+                <div className="relative">
+                  <Code className="h-6 w-6" />
+                  <Target className="h-3 w-3 absolute -top-1 -right-1 opacity-80" />
+                </div>
+                {/* Subtle glow effect */}
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-400 to-purple-500 opacity-20 blur-lg"></div>
               </div>
-              <div>
+              
+              <div className="space-y-1">
                 <h1 
-                  className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent cursor-pointer"
+                  className="text-2xl font-bold cursor-pointer hover:scale-105 transition-transform duration-200"
                   onClick={() => navigate('/')}
                 >
-                  Student Progress Hub
+                  <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                    CodeTracker
+                  </span>
+                  <span className="text-muted-foreground text-lg ml-1">Pro</span>
                 </h1>
-                <p className="text-sm text-muted-foreground">Track • Analyze • Excel</p>
+                <p className="text-sm text-muted-foreground font-medium">
+                  Monitor • Analyze • Accelerate
+                </p>
+
               </div>
             </div>
 
-            {/* Navigation */}
+            {/* Right Side Navigation */}
             <div className="flex items-center gap-4">
-              {/* Navigation Links */}
-              <div className="flex items-center gap-2">
+              {/* Navigation Links with Enhanced Styling */}
+              <div className="flex items-center gap-2 bg-muted/30 backdrop-blur-sm rounded-xl p-1">
                 <Button
                   variant={location.pathname === '/' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => navigate('/')}
+                  className="rounded-lg"
                 >
                   <Users className="h-4 w-4 mr-2" />
                   Students
@@ -108,30 +122,26 @@ const Layout = ({ children }) => {
                   variant={location.pathname === '/admin' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => navigate('/admin')}
+                  className="rounded-lg"
                 >
                   <Settings className="h-4 w-4 mr-2" />
                   Admin
                 </Button>
               </div>
 
-              {/* Theme Toggle */}
+              {/* Enhanced Theme Toggle */}
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={handleThemeToggle}
-                className="rounded-full relative"
+                className="rounded-xl border border-border/50 hover:border-border transition-colors"
                 title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
               >
                 {theme === 'light' ? (
-                  <Moon className="h-4 w-4 transition-transform duration-300" />
+                  <Moon className="h-4 w-4 transition-all duration-300" />
                 ) : (
-                  <Sun className="h-4 w-4 transition-transform duration-300" />
+                  <Sun className="h-4 w-4 transition-all duration-300 text-yellow-500" />
                 )}
-                
-                {/* Visual feedback */}
-                <span className="sr-only">
-                  {theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
-                </span>
               </Button>
             </div>
           </div>
