@@ -1,6 +1,8 @@
+import dotenv from 'dotenv'
+dotenv.config();
 import express from 'express';
 import cors from 'cors'
-import dotenv from 'dotenv'
+
 import connectDB from './config/db.js'
 import studentRoutes from './routes/studentRoutes.js'
 import cronRoutes from './routes/cronRoutes.js'
@@ -9,8 +11,9 @@ import { initializeCronJobs, stopAllCronJobs } from './utils/cronJobs.js';
 import { verifyEmailConnection } from './utils/sendEmail.js';
 
 
-dotenv.config();
+
 const app = express();
+
 
 // Connect to DB
 connectDB();
@@ -22,7 +25,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/v1/students', studentRoutes);
-app.use('api/v1/cron', cronRoutes)
+app.use('/api/v1/cron', cronRoutes)
 app.use('/api/v1/email', emailRouter)
 
 

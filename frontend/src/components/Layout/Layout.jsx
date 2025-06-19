@@ -1,12 +1,14 @@
-// src/components/Layout/Layout.js
 import React, { useState, useEffect } from 'react';
-import { GraduationCap, Moon, Sun, Users, TrendingUp, Trophy, RefreshCw } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { GraduationCap, Moon, Sun, Users, TrendingUp, Trophy, RefreshCw, Settings } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useTheme } from '../../contexts/ThemeContext';
 import { studentAPI } from '../../services/api';
 
 const Layout = ({ children }) => {
   const { theme, toggleTheme } = useTheme();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     totalStudents: 0,
     activeToday: 0,
@@ -50,6 +52,9 @@ const Layout = ({ children }) => {
     }
   };
 
+  // Don't show stats on admin page
+  const isAdminPage = location.pathname === '/admin';
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
       {/* Glassmorphic Header */}
@@ -58,19 +63,46 @@ const Layout = ({ children }) => {
           <div className="flex items-center justify-between">
             {/* Logo and Title */}
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 text-white">
+              <div 
+                className="p-2 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 text-white cursor-pointer"
+                onClick={() => navigate('/')}
+              >
                 <GraduationCap className="h-6 w-6" />
               </div>
               <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                <h1 
+                  className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent cursor-pointer"
+                  onClick={() => navigate('/')}
+                >
                   Student Progress Hub
                 </h1>
                 <p className="text-sm text-muted-foreground">Track • Analyze • Excel</p>
               </div>
             </div>
 
-            {/* Actions */}
-            <div className="flex items-center gap-2">
+            {/* Navigation */}
+            <div className="flex items-center gap-4">
+              {/* Navigation Links */}
+              <div className="flex items-center gap-2">
+                <Button
+                  variant={location.pathname === '/' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => navigate('/')}
+                >
+                  <Users className="h-4 w-4 mr-2" />
+                  Students
+                </Button>
+                <Button
+                  variant={location.pathname === '/admin' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => navigate('/admin')}
+                >
+                  <Settings className="h-4 w-4 mr-2" />
+                  Admin
+                </Button>
+              </div>
+
+              {/* Theme Toggle */}
               <Button
                 variant="ghost"
                 size="icon"
@@ -88,67 +120,76 @@ const Layout = ({ children }) => {
         </div>
       </header>
 
-      {/* Stats Cards */}
-      <div className="container mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          {/* Total Students */}
-          <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-xl p-4 border border-white/20 dark:border-slate-700/50">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
-                <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+      {/* Stats Cards - Only show on main dashboard */}
+      {!isAdminPage && (
+        <div className="container mx-auto px-4 py-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            {/* Total Students */}
+            <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-xl p-4 border border-white/20 dark:border-slate-700/50">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
+                  <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Total Students</p>
+                  <p className="text-2xl font-bold">{stats.totalStudents}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Total Students</p>
-                <p className="text-2xl font-bold">{stats.totalStudents}</p>
+            </div>
+
+            {/* Active Today */}
+            <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-xl p-4 border border-white/20 dark:border-slate-700/50">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/30">
+                  <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Active Today</p>
+                  <p className="text-2xl font-bold">{stats.activeToday}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Average Rating */}
+            <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-xl p-4 border border-white/20 dark:border-slate-700/50">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30">
+                  <Trophy className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Avg Rating</p>
+                  <p className="text-2xl font-bold">{stats.avgRating}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Need Sync */}
+            <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-xl p-4 border border-white/20 dark:border-slate-700/50">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-orange-100 dark:bg-orange-900/30">
+                  <RefreshCw className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Need Sync</p>
+                  <p className="text-2xl font-bold">{stats.needSync}</p>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Active Today */}
-          <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-xl p-4 border border-white/20 dark:border-slate-700/50">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/30">
-                <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Active Today</p>
-                <p className="text-2xl font-bold">{stats.activeToday}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Average Rating */}
-          <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-xl p-4 border border-white/20 dark:border-slate-700/50">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30">
-                <Trophy className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Avg Rating</p>
-                <p className="text-2xl font-bold">{stats.avgRating}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Need Sync */}
-          <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-xl p-4 border border-white/20 dark:border-slate-700/50">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-orange-100 dark:bg-orange-900/30">
-                <RefreshCw className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Need Sync</p>
-                <p className="text-2xl font-bold">{stats.needSync}</p>  
-              </div>
-            </div>
+          {/* Main Content Container for Dashboard */}
+          <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-xl border border-white/20 dark:border-slate-700/50 min-h-[600px]">
+            {children}
           </div>
         </div>
+      )}
 
-        {/* Main Content */}
-        <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-xl border border-white/20 dark:border-slate-700/50 min-h-[600px]">
+      {/* Direct Content for Admin Page */}
+      {isAdminPage && (
+        <div className="container mx-auto px-4">
           {children}
         </div>
-      </div>
+      )}
     </div>
   );
 };

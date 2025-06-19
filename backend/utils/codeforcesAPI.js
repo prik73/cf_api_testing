@@ -41,3 +41,37 @@ export async function getContestList() {
     throw error;
   }
 }
+
+export async function getContestStandings(contestId, handle) {
+  try {
+    const response = await axios.get(
+      `https://codeforces.com/api/contest.standings?contestId=${contestId}&handles=${handle}&showUnofficial=true`
+    );
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching contest standings for ${contestId}:`, error.message);
+    throw error;
+  }
+}
+
+// NEW: Get contest problems
+export async function getContestProblems(contestId) {
+  try {
+    const response = await axios.get(
+      `https://codeforces.com/api/contest.standings?contestId=${contestId}&from=1&count=1`
+    );
+    
+    if (response.data.status === 'OK') {
+      return {
+        status: 'OK',
+        result: {
+          problems: response.data.result.problems || []
+        }
+      };
+    }
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching contest problems for ${contestId}:`, error.message);
+    throw error;
+  }
+}

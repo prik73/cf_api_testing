@@ -1,11 +1,13 @@
+// src/pages/Dashboard.js - ENHANCED VERSION with Email Controls
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Download, Eye, Edit, Trash2, RefreshCw, Search } from 'lucide-react';
+import { Plus, Download, Eye, Edit, Trash2, RefreshCw, Search, Mail, Send } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Badge } from '../components/ui/badge';
+import { Switch } from '../components/ui/switch';
 import toast from 'react-hot-toast';
-import { studentAPI } from '../services/api';
+import { studentAPI, emailAPI } from '../services/api';
 import StudentForm from '../components/Students/StudentForm';
 import DeleteConfirm from '../components/Students/DeleteConfirm';
 import { formatDistanceToNow } from 'date-fns';
@@ -19,6 +21,8 @@ const Dashboard = () => {
   const [editingStudent, setEditingStudent] = useState(null);
   const [deleteStudent, setDeleteStudent] = useState(null);
   const [syncingIds, setSyncingIds] = useState(new Set());
+  const [emailingIds, setEmailingIds] = useState(new Set());
+  const [togglingEmailIds, setTogglingEmailIds] = useState(new Set());
 
   useEffect(() => {
     loadStudents();
@@ -66,6 +70,52 @@ const Dashboard = () => {
       console.error('Sync error:', error);
     } finally {
       setSyncingIds(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(studentId);
+        return newSet;
+      });
+    }
+  };
+
+  const handleSendTestEmail = async (studentId) => {
+    try {
+      setEmailingIds(prev => new Set(prev).add(studentId));
+      const response = await emailAPI.sendTestEmail(studentId);
+
+      if (response.data.success) {
+        toast.success('Test email sent successfully');
+        await loadStudents(); // Refresh to update email count
+      } else {
+        toast.error(response.data.error || 'Failed to send email');
+      }
+    } catch (error) {
+      toast.error('Failed to send test email');
+      console.error('Email error:', error);
+    } finally {
+      setEmailingIds(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(studentId);
+        return newSet;
+      });
+    }
+  };
+
+  const handleToggleEmail = async (studentId, currentStatus) => {
+    try {
+      setTogglingEmailIds(prev => new Set(prev).add(studentId));
+      const response = await emailAPI.updateEmailSettings(studentId, !currentStatus);
+
+      if (response.data.success) {
+        toast.success(response.data.message);
+        await loadStudents(); // Refresh to show updated status
+      } else {
+        toast.error('Failed to update email settings');
+      }
+    } catch (error) {
+      toast.error('Failed to update email settings');
+      console.error('Email toggle error:', error);
+    } finally {
+      setTogglingEmailIds(prev => {
         const newSet = new Set(prev);
         newSet.delete(studentId);
         return newSet;
@@ -124,9 +174,9 @@ const Dashboard = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h2 className="text-2xl font-bold">Student Management</h2>
-          <p className="text-muted-foreground">Manage and track student progress</p>
+          <p className="text-muted-foreground">Manage students, emails, and sync data</p>
         </div>
-        
+
         <div className="flex items-center gap-2">
           <Button onClick={handleExportCSV} variant="outline" size="sm">
             <Download className="h-4 w-4 mr-2" />
@@ -152,7 +202,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Table */}
+      {/* Enhanced Table */}
       <div className="rounded-lg border">
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -160,10 +210,11 @@ const Dashboard = () => {
               <tr className="border-b bg-muted/50">
                 <th className="text-left p-4 font-medium">Name</th>
                 <th className="text-left p-4 font-medium">Email</th>
-                <th className="text-left p-4 font-medium hidden sm:table-cell">Phone Number</th>
+                <th className="text-left p-4 font-medium hidden sm:table-cell">Phone</th>
                 <th className="text-left p-4 font-medium">CF Handle</th>
-                <th className="text-left p-4 font-medium">Current Rating</th>
+                <th className="text-left p-4 font-medium">Rating</th>
                 <th className="text-left p-4 font-medium hidden lg:table-cell">Max Rating</th>
+                <th className="text-left p-4 font-medium">Email Status</th>
                 <th className="text-left p-4 font-medium hidden md:table-cell">Last Sync</th>
                 <th className="text-left p-4 font-medium">Actions</th>
               </tr>
@@ -187,18 +238,49 @@ const Dashboard = () => {
                       {student.maxRating || 'Unrated'}
                     </Badge>
                   </td>
+
+                  {/* NEW: Email Status Column */}
+                  <td className="p-4">
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1">
+                        {student.emailEnabled ? (
+                          <Mail className="h-4 w-4 text-green-600" />
+                        ) : (
+                          <Mail className="h-4 w-4 text-gray-400" />
+                        )}
+                        <span className="text-xs">
+                          {student.emailEnabled ? 'On' : 'Off'}
+                        </span>
+                      </div>
+                      {student.emailCount > 0 && (
+                        <Badge variant="secondary" className="text-xs">
+                          {student.emailCount}
+                        </Badge>
+                      )}
+                      <Switch
+                        checked={student.emailEnabled}
+                        onCheckedChange={() => handleToggleEmail(student._id, student.emailEnabled)}
+                        disabled={togglingEmailIds.has(student._id)}
+                        size="sm"
+                      />
+                    </div>
+                  </td>
+
                   <td className="p-4 text-sm text-muted-foreground hidden md:table-cell">
-                    {student.lastSync 
+                    {student.lastSync
                       ? formatDistanceToNow(new Date(student.lastSync), { addSuffix: true })
                       : 'Never'
                     }
                   </td>
+
+                  {/* ENHANCED: Actions Column */}
                   <td className="p-4">
                     <div className="flex items-center gap-1">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => handleViewProfile(student)}
+                        title="View Profile"
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
@@ -206,6 +288,7 @@ const Dashboard = () => {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleEditStudent(student)}
+                        title="Edit Student"
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
@@ -213,6 +296,7 @@ const Dashboard = () => {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleDeleteStudent(student)}
+                        title="Delete Student"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -221,8 +305,18 @@ const Dashboard = () => {
                         size="sm"
                         onClick={() => handleSync(student._id)}
                         disabled={syncingIds.has(student._id)}
+                        title="Sync Data"
                       >
                         <RefreshCw className={`h-4 w-4 ${syncingIds.has(student._id) ? 'animate-spin' : ''}`} />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleSendTestEmail(student._id)}
+                        disabled={emailingIds.has(student._id) || !student.emailEnabled}
+                        title="Send Test Email"
+                      >
+                        <Send className={`h-4 w-4 ${emailingIds.has(student._id) ? 'animate-pulse' : ''}`} />
                       </Button>
                     </div>
                   </td>
@@ -231,12 +325,19 @@ const Dashboard = () => {
             </tbody>
           </table>
         </div>
-        
+
         {filteredStudents.length === 0 && (
           <div className="text-center py-8 text-muted-foreground">
             {searchTerm ? 'No students found matching your search.' : 'No students added yet.'}
           </div>
         )}
+      </div>
+
+      {/* Summary Stats */}
+      <div className="mt-6 flex flex-wrap gap-4 text-sm text-muted-foreground">
+        <div>Total Students: <span className="font-medium">{students.length}</span></div>
+        <div>Email Enabled: <span className="font-medium">{students.filter(s => s.emailEnabled).length}</span></div>
+        <div>Total Emails Sent: <span className="font-medium">{students.reduce((sum, s) => sum + (s.emailCount || 0), 0)}</span></div>
       </div>
 
       {/* Modals */}

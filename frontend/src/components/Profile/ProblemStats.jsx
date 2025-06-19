@@ -1,4 +1,3 @@
-// src/components/Profile/ProblemStats.js
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
@@ -58,19 +57,19 @@ const ProblemStats = ({ data, problemDays, onFilterChange, loading }) => {
             Problem Solving Data
           </CardTitle>
           
-          {/* Filter Buttons */}
+          {/* Filter Buttons - FIXED to prevent page reload */}
           <div className="flex gap-1">
             {filterOptions.map((option) => (
               <Button
-                type="button"
                 key={option.value}
+                type="button"
                 variant={problemDays === option.value ? 'default' : 'outline'}
                 size="sm"
-                onClick={() => {
-                    e.preventDefault();
-                    onFilterChange(option.value)
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onFilterChange(option.value);
                 }}
-                
               >
                 {option.label}
               </Button>

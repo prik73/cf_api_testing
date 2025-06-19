@@ -1,3 +1,4 @@
+
 // src/components/Profile/ContestHistory.js
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -66,17 +67,18 @@ const ContestHistory = ({ data, contestDays, onFilterChange, loading }) => {
             Contest History
           </CardTitle>
           
-          {/* Filter Buttons */}
+          {/* Filter Buttons - FIXED to prevent page reload */}
           <div className="flex gap-1">
             {filterOptions.map((option) => (
               <Button
-                
                 key={option.value}
+                type="button"
                 variant={contestDays === option.value ? 'default' : 'outline'}
                 size="sm"
-                onClick={() => {
-                    e.preventDefault();
-                    onFilterChange(option.value)
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onFilterChange(option.value);
                 }}
               >
                 {option.label}

@@ -1,4 +1,3 @@
-// src/services/api.js
 import axios from 'axios';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
@@ -58,4 +57,40 @@ export const studentAPI = {
   })
 };
 
-export default api; 
+// Email API endpoints
+export const emailAPI = {
+  // Get email system status
+  getStatus: () => api.get('/email/status'),
+  
+  // Send test email to student
+  sendTestEmail: (studentId) => 
+    api.post(`/email/student/${studentId}/test`),
+  
+  // Update email settings for student
+  updateEmailSettings: (studentId, emailEnabled) =>
+    api.put(`/email/student/${studentId}/settings`, { emailEnabled }),
+  
+  // Get email stats for student
+  getEmailStats: (studentId) => 
+    api.get(`/email/student/${studentId}/stats`),
+  
+  // Get all students with email settings
+  getAllStudentsEmailSettings: () => api.get('/email/students')
+};
+
+// Cron API endpoints
+export const cronAPI = {
+  // Get cron job status
+  getStatus: () => api.get('/cron/status'),
+  
+  // Configure cron schedule
+  configure: (config) => api.post('/cron/configure', config),
+  
+  // Trigger manual sync
+  triggerManualSync: () => api.post('/cron/trigger'),
+  
+  // Get available schedules
+  getSchedules: () => api.get('/cron/schedules')
+};
+
+export default api;

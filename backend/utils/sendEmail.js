@@ -1,21 +1,34 @@
-// utils/sendEmail.js - CORRECT VERSION per nodemailer.com
+// REPLACE the entire sendEmail.js with this version that uses lazy loading:
+
 import nodemailer from 'nodemailer';
 import Student from '../models/Student.js';
 
-// Create email transporter - Official nodemailer way
+// REMOVE the immediate initialization - use lazy loading instead
+let emailTransporter = null;
+
+// Create email transporter - ONLY when first called
 const createEmailTransporter = () => {
+  console.log('🔍 Email credentials check:');
+  console.log('EMAIL_USER:', process.env.EMAIL_USER ? `✅ Set (${process.env.EMAIL_USER.length} chars)` : '❌ Missing');
+  console.log('EMAIL_PASS:', process.env.EMAIL_PASS ? `✅ Set (${process.env.EMAIL_PASS.length} chars)` : '❌ Missing');
+
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
     console.log('⚠️ Email credentials not configured in .env file');
     return null;
   }
 
   try {
-    // Official nodemailer.createTransport syntax
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
+    console.log('🔧 Creating Gmail transporter...');
+    const transporter = nodemailer.createTransport  ({
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
+      },
+      tls: {
+        rejectUnauthorized: false
       }
     });
     
@@ -27,18 +40,25 @@ const createEmailTransporter = () => {
   }
 };
 
-// Initialize transporter
-const emailTransporter = createEmailTransporter();
+// Lazy getter - creates transporter only when needed
+const getEmailTransporter = () => {
+  if (!emailTransporter) {
+    emailTransporter = createEmailTransporter();
+  }
+  return emailTransporter;
+};
 
 // Verify email connection
 export const verifyEmailConnection = async () => {
-  if (!emailTransporter) {
+  const transporter = getEmailTransporter();
+  if (!transporter) {
     console.log('📧 Email transporter not available');
     return false;
   }
 
   try {
-    await emailTransporter.verify();
+    console.log('🔍 Testing email connection...');
+    await transporter.verify();
     console.log('✅ Email connection verified successfully');
     return true;
   } catch (error) {
@@ -49,7 +69,8 @@ export const verifyEmailConnection = async () => {
 
 // Send inactivity reminder email
 export async function sendInactivityEmail(student) {
-  if (!emailTransporter) {
+  const transporter = getEmailTransporter();
+  if (!transporter) {
     console.log(`📧 Email service not available, skipping email to ${student.email}`);
     return { success: false, error: 'Email service not configured' };
   }
@@ -97,7 +118,7 @@ export async function sendInactivityEmail(student) {
       `
     };
     
-    const result = await emailTransporter.sendMail(mailOptions);
+    const result = await transporter.sendMail(mailOptions);
     console.log(`✅ Inactivity email sent to ${student.email}`);
     
     // Update email count
@@ -115,7 +136,8 @@ export async function sendInactivityEmail(student) {
 
 // Send welcome email for new students
 export async function sendWelcomeEmail(student) {
-  if (!emailTransporter) {
+  const transporter = getEmailTransporter();
+  if (!transporter) {
     console.log('📧 Email service not available, skipping welcome email');
     return { success: false, error: 'Email service not configured' };
   }
@@ -153,7 +175,7 @@ export async function sendWelcomeEmail(student) {
       `
     };
     
-    const result = await emailTransporter.sendMail(mailOptions);
+    const result = await transporter.sendMail(mailOptions);
     console.log(`✅ Welcome email sent to ${student.email}`);
     return { success: true, messageId: result.messageId };
     
@@ -163,13 +185,13 @@ export async function sendWelcomeEmail(student) {
   }
 }
 
-// Export the transporter for other modules if needed
-export { emailTransporter };
+// Export the getter function instead of the transporter directly
+export const getTransporter = getEmailTransporter;
 
 // Export both named and default exports
 export default { 
   sendInactivityEmail, 
   sendWelcomeEmail, 
   verifyEmailConnection,
-  emailTransporter
+  getTransporter
 };
