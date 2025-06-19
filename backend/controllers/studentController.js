@@ -244,39 +244,61 @@ export const getStudentProfile = async (req, res) => {
       return res.status(404).json({ error: 'Student not found' });
     }
 
-    // Contest History Filtering - handle "All Time" case
+    console.log('🔍 Profile request:', { 
+      studentId: req.params.id, 
+      contestDays, 
+      problemDays,
+      contestDaysType: typeof contestDays,
+      problemDaysType: typeof problemDays
+    });
+
+    // FIXED: Better handling of "All Time" filters
+    // Convert string parameters to numbers, handle -1 as "all time"
+    const contestDaysNum = contestDays === '-1' || contestDays === -1 ? -1 : parseInt(contestDays);
+    const problemDaysNum = problemDays === '-1' || problemDays === -1 ? -1 : parseInt(problemDays);
+
+    console.log('🔍 Converted params:', { contestDaysNum, problemDaysNum });
+
+    // Contest History Filtering - FIXED All Time handling
     let contestHistory;
-    if (contestDays && contestDays !== '-1') {
+    if (contestDaysNum === -1) {
+      console.log('📊 Getting ALL contest history (no date filter)');
+      contestHistory = await ContestParticipation.find({
+        studentId: req.params.id
+      }).sort({ timestamp: -1 });
+    } else {
+      console.log(`📊 Getting contest history for last ${contestDaysNum} days`);
       const contestDateLimit = new Date();
-      contestDateLimit.setDate(contestDateLimit.getDate() - parseInt(contestDays));
+      contestDateLimit.setDate(contestDateLimit.getDate() - contestDaysNum);
       
       contestHistory = await ContestParticipation.find({
         studentId: req.params.id,
         timestamp: { $gte: contestDateLimit }
       }).sort({ timestamp: -1 });
-    } else {
-      // All time - no date filter
-      contestHistory = await ContestParticipation.find({
-        studentId: req.params.id
-      }).sort({ timestamp: -1 });
     }
 
-    // Problem Solving Data Filtering - handle "All Time" case  
+    // Problem Solving Data Filtering - FIXED All Time handling  
     let submissions;
-    if (problemDays && problemDays !== '-1') {
+    if (problemDaysNum === -1) {
+      console.log('📊 Getting ALL submissions (no date filter)');
+      submissions = await Submission.find({
+        studentId: req.params.id
+      }).sort({ timestamp: -1 });
+    } else {
+      console.log(`📊 Getting submissions for last ${problemDaysNum} days`);
       const problemDateLimit = new Date();
-      problemDateLimit.setDate(problemDateLimit.getDate() - parseInt(problemDays));
+      problemDateLimit.setDate(problemDateLimit.getDate() - problemDaysNum);
 
       submissions = await Submission.find({
         studentId: req.params.id,
         timestamp: { $gte: problemDateLimit }
       }).sort({ timestamp: -1 });
-    } else {
-      // All time - no date filter
-      submissions = await Submission.find({
-        studentId: req.params.id
-      }).sort({ timestamp: -1 });
     }
+
+    console.log('📊 Data counts:', { 
+      contestHistory: contestHistory.length, 
+      submissions: submissions.length 
+    });
 
     // Enhanced Statistics (rest of your existing code...)
     const acceptedSubmissions = submissions.filter(sub => sub.verdict === 'OK');
@@ -305,10 +327,15 @@ export const getStudentProfile = async (req, res) => {
       ratingBuckets[bucket] = (ratingBuckets[bucket] || 0) + 1;
     });
 
-    // Average problems per day
-    const daysDiff = problemDays && problemDays !== '-1' 
-      ? Math.max(1, parseInt(problemDays))
-      : Math.max(1, Math.ceil((Date.now() - new Date(student.createdAt)) / (1000 * 60 * 60 * 24)));
+    // Average problems per day - FIXED calculation for All Time
+    let daysDiff;
+    if (problemDaysNum === -1) {
+      // For "All Time", calculate from student creation date
+      const studentCreated = new Date(student.createdAt);
+      daysDiff = Math.max(1, Math.ceil((Date.now() - studentCreated) / (1000 * 60 * 60 * 24)));
+    } else {
+      daysDiff = Math.max(1, problemDaysNum);
+    }
     const avgProblemsPerDay = uniqueProblems / daysDiff;
 
     res.json({
@@ -325,10 +352,11 @@ export const getStudentProfile = async (req, res) => {
         ratingBuckets,
         heatmapData
       },
-      submissions: submissions.slice(0, 100)
+      submissions: submissions.slice(0, 100) // Limit to last 100 for performance
     });
 
   } catch (error) {
+    console.error('❌ Profile load error:', error);
     res.status(500).json({ error: error.message });
   }
 };

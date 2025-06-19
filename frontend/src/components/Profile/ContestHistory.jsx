@@ -1,5 +1,3 @@
-
-// src/components/Profile/ContestHistory.js
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
@@ -16,7 +14,17 @@ const ContestHistory = ({ data, contestDays, onFilterChange, loading }) => {
     { value: -1, label: 'All Time' }
   ];
 
-  // Prepare chart data - sort by timestamp first
+  // FIXED: Proper event handling to prevent reload
+  const handleFilterChange = (value, event) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    console.log('Filter changed to:', value); // Debug log
+    onFilterChange(value);
+  };
+
+  // Rest of your existing code for charts and rendering...
   const sortedData = [...data].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
   
   const chartData = sortedData.map((contest, index) => ({
@@ -64,32 +72,35 @@ const ContestHistory = ({ data, contestDays, onFilterChange, loading }) => {
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5" />
-            Contest History
+            Contest History ({data.length} contests)
           </CardTitle>
           
-          {/* Filter Buttons - FIXED to prevent page reload */}
+          {/* FIXED: Proper button event handling */}
           <div className="flex gap-1">
             {filterOptions.map((option) => (
               <Button
                 key={option.value}
-                type="button"
+                type="button" // Explicitly set type to prevent form submission
                 variant={contestDays === option.value ? 'default' : 'outline'}
                 size="sm"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  onFilterChange(option.value);
-                }}
+                className="px-3 py-1"
+                onClick={(e) => handleFilterChange(option.value, e)}
               >
                 {option.label}
               </Button>
             ))}
           </div>
         </div>
+        
+        {/* Debug info */}
+        <p className="text-xs text-muted-foreground">
+          Current filter: {contestDays === -1 ? 'All Time' : `${contestDays} days`} | 
+          Data count: {data.length}
+        </p>
       </CardHeader>
 
       <CardContent className="space-y-6">
-        {/* Rating Graph */}
+        {/* Your existing chart and list code... */}
         {chartData.length > 0 ? (
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -142,6 +153,7 @@ const ContestHistory = ({ data, contestDays, onFilterChange, loading }) => {
             <div className="text-center">
               <Calendar className="h-12 w-12 mx-auto mb-2 opacity-50" />
               <p>No contest history for selected period</p>
+              <p className="text-xs mt-1">Try selecting "All Time" to see all contests</p>
             </div>
           </div>
         )}
@@ -168,7 +180,7 @@ const ContestHistory = ({ data, contestDays, onFilterChange, loading }) => {
                     <div className="text-right">
                       <p className="text-sm font-medium">Rank: {contest.rank}</p>
                       <p className="text-xs text-muted-foreground">
-                        Unsolved: {contest.unsolvedProblems || 0}
+                        Rating: {contest.oldRating} → {contest.newRating}
                       </p>
                     </div>
                     

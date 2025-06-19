@@ -14,6 +14,16 @@ const ProblemStats = ({ data, problemDays, onFilterChange, loading }) => {
     { value: -1, label: 'All Time' }
   ];
 
+  // FIXED: Proper event handling to prevent reload
+  const handleFilterChange = (value, event) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    console.log('Problem filter changed to:', value); // Debug log
+    onFilterChange(value);
+  };
+
   // Prepare rating buckets data for bar chart
   const ratingBucketsData = Object.entries(data.ratingBuckets || {})
     .map(([rating, count]) => ({
@@ -57,25 +67,28 @@ const ProblemStats = ({ data, problemDays, onFilterChange, loading }) => {
             Problem Solving Data
           </CardTitle>
           
-          {/* Filter Buttons - FIXED to prevent page reload */}
+          {/* FIXED: Proper button event handling */}
           <div className="flex gap-1">
             {filterOptions.map((option) => (
               <Button
                 key={option.value}
-                type="button"
+                type="button" // Explicitly set type to prevent form submission
                 variant={problemDays === option.value ? 'default' : 'outline'}
                 size="sm"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  onFilterChange(option.value);
-                }}
+                className="px-3 py-1"
+                onClick={(e) => handleFilterChange(option.value, e)}
               >
                 {option.label}
               </Button>
             ))}
           </div>
         </div>
+        
+        {/* Debug info */}
+        <p className="text-xs text-muted-foreground">
+          Current filter: {problemDays === -1 ? 'All Time' : `${problemDays} days`} | 
+          Problems: {data.totalProblems || 0}
+        </p>
       </CardHeader>
 
       <CardContent className="space-y-6">
@@ -150,6 +163,7 @@ const ProblemStats = ({ data, problemDays, onFilterChange, loading }) => {
               <div className="text-center">
                 <Target className="h-12 w-12 mx-auto mb-2 opacity-50" />
                 <p>No problems solved in selected period</p>
+                <p className="text-xs mt-1">Try selecting "All Time" to see all problems</p>
               </div>
             </div>
           )}

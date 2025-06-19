@@ -24,25 +24,50 @@ const StudentProfile = () => {
     loadProfile();
   }, [id, contestDays, problemDays]);
 
-  const loadProfile = async () => {
-    try {
-      setLoading(true);
-      
-      // Handle "All Time" filter (-1) by not sending contestDays/problemDays params
-      const params = {};
-      if (contestDays !== -1) params.contestDays = contestDays;
-      if (problemDays !== -1) params.problemDays = problemDays;
-      
-      const response = await studentAPI.getProfile(id, params);
-      setStudent(response.data.student);
-      setProfileData(response.data);
-    } catch (error) {
-      toast.error('Failed to load student profile');
-      console.error('Profile load error:', error);
-    } finally {
-      setLoading(false);
+const loadProfile = async () => {
+  try {
+    setLoading(true);
+    
+    console.log('🔍 Loading profile with filters:', { 
+      id, 
+      contestDays, 
+      problemDays,
+      contestDaysType: typeof contestDays,
+      problemDaysType: typeof problemDays
+    });
+    
+    // Handle "All Time" filter (-1) by not sending contestDays/problemDays params
+    const params = {};
+    if (contestDays !== -1) {
+      params.contestDays = contestDays;
     }
-  };
+    if (problemDays !== -1) {
+      params.problemDays = problemDays;
+    }
+    
+    console.log('🔍 API params being sent:', params);
+    
+    const response = await studentAPI.getProfile(id, params);
+    
+    console.log('🔍 API response:', {
+      contestHistoryCount: response.data.contestHistory?.length || 0,
+      submissionsCount: response.data.submissions?.length || 0,
+      totalProblems: response.data.statistics?.totalProblems || 0
+    });
+    
+    setStudent(response.data.student);
+    setProfileData(response.data);
+  } catch (error) {
+    console.error('❌ Profile load error:', error);
+    toast.error('Failed to load student profile');
+  } finally {
+    setLoading(false);
+  }
+};
+useEffect(() => {
+  console.log('🔍 Filter state changed:', { contestDays, problemDays });
+  loadProfile();
+}, [id, contestDays, problemDays]);
 
   const handleSync = async () => {
     try {

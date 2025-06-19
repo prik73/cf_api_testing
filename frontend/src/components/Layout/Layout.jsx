@@ -52,6 +52,18 @@ const Layout = ({ children }) => {
     }
   };
 
+  const handleThemeToggle = () => {
+    console.log('🎨 Theme toggle clicked:', theme, '→', theme === 'light' ? 'dark' : 'light');
+    toggleTheme();
+    
+    // Force a visual update
+    setTimeout(() => {
+      const root = document.documentElement;
+      console.log('🎨 After toggle - HTML classes:', root.className);
+      console.log('🎨 Background color:', getComputedStyle(root).getPropertyValue('--background'));
+    }, 100);
+  };
+
   // Don't show stats on admin page
   const isAdminPage = location.pathname === '/admin';
 
@@ -106,14 +118,20 @@ const Layout = ({ children }) => {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={toggleTheme}
-                className="rounded-full"
+                onClick={handleThemeToggle}
+                className="rounded-full relative"
+                title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
               >
                 {theme === 'light' ? (
-                  <Moon className="h-4 w-4" />
+                  <Moon className="h-4 w-4 transition-transform duration-300" />
                 ) : (
-                  <Sun className="h-4 w-4" />
+                  <Sun className="h-4 w-4 transition-transform duration-300" />
                 )}
+                
+                {/* Visual feedback */}
+                <span className="sr-only">
+                  {theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+                </span>
               </Button>
             </div>
           </div>

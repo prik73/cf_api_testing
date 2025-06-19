@@ -45,8 +45,34 @@ export const studentAPI = {
   delete: (id) => api.delete(`/students/${id}`),
   
   // Get student profile with filtering
-  getProfile: (id, params = {}) => 
-    api.get(`/students/${id}/profile`, { params }),
+  getProfile: (id, params = {}) => {
+    console.log('🔍 API client getProfile called with:', { id, params });
+    
+    // Clean up parameters - remove undefined values and handle -1 properly
+    const cleanParams = {};
+    
+    if (params.contestDays !== undefined && params.contestDays !== null) {
+      if (params.contestDays === -1) {
+        // For "All Time", send -1 explicitly
+        cleanParams.contestDays = -1;
+      } else {
+        cleanParams.contestDays = params.contestDays;
+      }
+    }
+    
+    if (params.problemDays !== undefined && params.problemDays !== null) {
+      if (params.problemDays === -1) {
+        // For "All Time", send -1 explicitly  
+        cleanParams.problemDays = -1;
+      } else {
+        cleanParams.problemDays = params.problemDays;
+      }
+    }
+    
+    console.log('🔍 API client sending clean params:', cleanParams);
+    
+    return api.get(`/students/${id}/profile`, { params: cleanParams });
+  },
   
   // Manual sync student data
   sync: (id) => api.post(`/students/${id}/sync`),

@@ -1,6 +1,7 @@
 /frontend/node_module/
 /backend/node_modules/
 backend/.env
+frontend/.env
 
 # OS files
 .DS_Store
