@@ -1,7 +1,7 @@
 // src/services/api.js
 import axios from 'axios';
 
-const API_BASE =  'http://localhost:5000/api/v1';
+const API_BASE =  'https://cf-api-testing.onrender.com:5000/api/v1';
 
 // Create axios instance with default config
 const api = axios.create({
