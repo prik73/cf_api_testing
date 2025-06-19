@@ -5,7 +5,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import Layout from './components/Layout/Layout';
 import Dashboard from './pages/Dashboard';
 import StudentProfile from './pages/StudentProfile';
-import AdminDashboard from './pages/AdminDashboard'; // NEW
+import AdminDashboard from './pages/AdminDashboard';
 import './App.css';
 
 function App() {
