@@ -14,9 +14,9 @@ function App() {
     <ThemeProvider>
       <Router>
         <div className="min-h-screen bg-background text-foreground">
+          <Analytics/>
           <Layout>
             <Routes>
-              <Analytics/>
               {/* Dashboard - Main student table */}
               <Route path="/" element={<Dashboard />} />
               
