@@ -68,9 +68,9 @@ const Layout = ({ children }) => {
   const isAdminPage = location.pathname === '/admin';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
-      {/* Glassmorphic Header */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border-b border-white/20 dark:border-slate-700/50">
+    <div className="min-h-screen bg-background text-foreground">
+      {/* FIXED: Header with CSS variables */}
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/70 border-b border-border">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             {/* Logo and Title */}
@@ -142,61 +142,61 @@ const Layout = ({ children }) => {
       {!isAdminPage && (
         <div className="container mx-auto px-4 py-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            {/* Total Students */}
-            <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-xl p-4 border border-white/20 dark:border-slate-700/50">
+            {/* FIXED: Total Students - Using CSS variables */}
+            <div className="bg-card backdrop-blur-xl rounded-xl p-4 border border-border">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
+                <div className="p-2 rounded-lg bg-blue-500/10">
                   <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Total Students</p>
-                  <p className="text-2xl font-bold">{stats.totalStudents}</p>
+                  <p className="text-2xl font-bold text-card-foreground">{stats.totalStudents}</p>
                 </div>
               </div>
             </div>
 
-            {/* Active Today */}
-            <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-xl p-4 border border-white/20 dark:border-slate-700/50">
+            {/* FIXED: Active Today - Using CSS variables */}
+            <div className="bg-card backdrop-blur-xl rounded-xl p-4 border border-border">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/30">
+                <div className="p-2 rounded-lg bg-green-500/10">
                   <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Active Today</p>
-                  <p className="text-2xl font-bold">{stats.activeToday}</p>
+                  <p className="text-2xl font-bold text-card-foreground">{stats.activeToday}</p>
                 </div>
               </div>
             </div>
 
-            {/* Average Rating */}
-            <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-xl p-4 border border-white/20 dark:border-slate-700/50">
+            {/* FIXED: Average Rating - Using CSS variables */}
+            <div className="bg-card backdrop-blur-xl rounded-xl p-4 border border-border">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30">
+                <div className="p-2 rounded-lg bg-purple-500/10">
                   <Trophy className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Avg Rating</p>
-                  <p className="text-2xl font-bold">{stats.avgRating}</p>
+                  <p className="text-2xl font-bold text-card-foreground">{stats.avgRating}</p>
                 </div>
               </div>
             </div>
 
-            {/* Need Sync */}
-            <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-xl p-4 border border-white/20 dark:border-slate-700/50">
+            {/* FIXED: Need Sync - Using CSS variables */}
+            <div className="bg-card backdrop-blur-xl rounded-xl p-4 border border-border">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-orange-100 dark:bg-orange-900/30">
+                <div className="p-2 rounded-lg bg-orange-500/10">
                   <RefreshCw className="h-5 w-5 text-orange-600 dark:text-orange-400" />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Need Sync</p>
-                  <p className="text-2xl font-bold">{stats.needSync}</p>
+                  <p className="text-2xl font-bold text-card-foreground">{stats.needSync}</p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Main Content Container for Dashboard */}
-          <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-xl border border-white/20 dark:border-slate-700/50 min-h-[600px]">
+          {/* FIXED: Main Content Container - Using CSS variables */}
+          <div className="bg-card backdrop-blur-xl rounded-xl border border-border min-h-[600px]">
             {children}
           </div>
         </div>
