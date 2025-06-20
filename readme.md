@@ -1,5 +1,6 @@
 # # Student Progress Management System
-**Live Demo**: https://tle.prik.dev
+**Live demo**: https://tle.prik.dev<br>
+**Video-demo**: https://drive.google.com/file/d/1PJT96GILr4eH5r85VMAWcjKAkmEjhlOp/view?usp=drivesdk
 ## Product Overview
 
 A MERN stack web application for tracking competitive programming progress on Codeforces. Features automated data synchronization, email notifications, and comprehensive analytics dashboard.
