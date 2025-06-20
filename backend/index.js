@@ -20,7 +20,12 @@ connectDB();
 verifyEmailConnection();
 
 // Middleware
-app.use(cors());
+const corsOptions = {
+  origin: ['http://localhost:5173', 'https://tle.prik.dev'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Routes
