@@ -53,15 +53,7 @@ const Layout = ({ children }) => {
   };
 
   const handleThemeToggle = () => {
-    console.log('🎨 Theme toggle clicked:', theme, '→', theme === 'light' ? 'dark' : 'light');
     toggleTheme();
-    
-    // Force a visual update
-    setTimeout(() => {
-      const root = document.documentElement;
-      console.log('🎨 After toggle - HTML classes:', root.className);
-      console.log('🎨 Background color:', getComputedStyle(root).getPropertyValue('--background'));
-    }, 100);
   };
 
   // Don't show stats on admin page
