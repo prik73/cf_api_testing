@@ -33,7 +33,8 @@ async function runDailyTasks() {
 Admin Access: Navigate to /admin → View cron status, trigger manual sync, configure schedule
 
 ### Inactivity Detection & Email Notifications
-### backend logs (render):  ![image](https://github.com/user-attachments/assets/8be5898b-915f-4f33-b781-bda7db738414)
+### backend logs (render): ![image](https://github.com/user-attachments/assets/37087f05-bbb4-4ed1-ae6e-53344e58abc9)
+  ![image](https://github.com/user-attachments/assets/8be5898b-915f-4f33-b781-bda7db738414)<br><br>
 
 Backend Logic (backend/utils/cronJobs.js line 85-105):
 
