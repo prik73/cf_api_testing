@@ -33,7 +33,10 @@ async function runDailyTasks() {
 Admin Access: Navigate to /admin → View cron status, trigger manual sync, configure schedule
 
 ### Inactivity Detection & Email Notifications
+### backend logs (render):  ![image](https://github.com/user-attachments/assets/8be5898b-915f-4f33-b781-bda7db738414)
+
 Backend Logic (backend/utils/cronJobs.js line 85-105):
+
 
 ```javascript
 // Checks if student has no submissions in last 7 days
